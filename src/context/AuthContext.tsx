@@ -46,7 +46,7 @@ export const AuthContextProvider: FC = ({ children }) => {
       dispatch({ type: 'AUTH_IS_READY', payload: user })
       // unsubscribe() // ?? Shouldn't this be outside of um, itself?
     })
-    return unsubscribe()
+    return () => unsubscribe()
   }, [])
 
   console.log('AuthContext state:', state)

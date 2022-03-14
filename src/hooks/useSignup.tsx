@@ -1,6 +1,9 @@
 import { useEffect, useState } from 'react'
 import { projectAuth } from '../firebase/config'
 import { useAuthContext } from './useAuthContext';
+import { handleError } from '../ts/ErrorHandler';
+
+
 
 export const useSignup = () => {
   const [isCancelled, setIsCancelled] = useState(false);
@@ -28,7 +31,7 @@ export const useSignup = () => {
     } catch (err) {
       if (!isCancelled) {
         setIsPending(false)
-        setError(err)
+        setError(handleError(err))
       }
     }
   }
