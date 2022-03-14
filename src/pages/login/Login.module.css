@@ -17,3 +17,8 @@
   color: #777;
   width: 100%;
 }
+
+.login-form p {
+  margin-top: 1em;
+  color: red;
+}
