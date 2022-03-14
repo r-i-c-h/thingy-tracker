@@ -10,6 +10,7 @@ type Action =
   | { type: 'AUTH_IS_READY', payload: User }
 
 type ContextState = {
+  uid: string | null
   user: User;
   authIsReady: boolean;
   dispatch?: Dispatch<Action>; //   dispatch: ({type}:{type:string}) => void;
@@ -32,6 +33,7 @@ export const authReducer = (state: ContextState, action: Action) => {
 
 export const AuthContextProvider: FC = ({ children }) => {
   const [state, dispatch] = useReducer(authReducer, {
+    uid: null,
     user: null,
     authIsReady: false
   });
