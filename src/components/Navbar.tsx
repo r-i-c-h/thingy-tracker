@@ -16,10 +16,12 @@ function Navbar() {
           <li><Link to="/signup">Signup</Link></li>
         </>)
         }
-        {user &&
+        {user && (<>
+          <li>Hello {user.displayName}</li>
           <li>
             <button className="btn" onClick={logout}>Logout</button>
           </li>
+        </>)
         }
       </ul>
     </nav>

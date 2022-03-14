@@ -20,7 +20,19 @@
 .navbar button,
 .navbar a {
   margin-left: 16px;
+  border: 2px solid #333;
+  padding: 0.2em;
+  border-radius: 15px;
 }
+.navbar a:hover {
+  color: #effaef;
+  background-color: #333;
+}
+.navbar ul li:first-child a {
+  margin-left: 0;
+  border: none;
+}
+
 .navbar a {
   color: #333;
   text-decoration: none;
