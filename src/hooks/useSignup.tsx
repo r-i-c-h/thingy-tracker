@@ -1,29 +1,32 @@
 import { useState } from 'react'
 import { projectAuth } from '../firebase/config'
+import { useAuthContext } from './useAuthContext';
 
 export const useSignup = () => {
   const [error, setError] = useState<unknown>(null)
   const [isPending, setIsPending] = useState(false)
+  const { dispatch } = useAuthContext();
 
   const signup = async (email: string, password: string, displayName: string) => {
-    setError(null)
     setIsPending(true)
+    setError(null)
 
     try {
       const res = await projectAuth.createUserWithEmailAndPassword(email, password)
 
       if (!res) { throw new Error('Could not complete signup') }
 
-      // add display name to user
-      await res.user?.updateProfile({ displayName })
+      await res.user?.updateProfile({ displayName })// add display name to user
+
+      dispatch!({ type: 'LOGIN', payload: res.user })
+
       setIsPending(false)
       setError(null)
     } catch (error) {
-      setError(error)
       setIsPending(false)
+      setError(error)
     }
   }
-
 
   return { error, isPending, signup }
 }
