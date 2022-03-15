@@ -1,20 +1,26 @@
+import { useEffect, useState } from 'react';
+import { useFirestore } from '../hooks/useFirestore';
 
-import { useState } from 'react';
 import styles from './TransactionForm.module.css'
 
-export default function TransactionForm() {
+export default function TransactionForm({ uid }: { uid: string }) {
   const [name, setName] = useState('');
   const [amount, setAmount] = useState('')
 
+  const { addDocument, response } = useFirestore('transactions');
+
   const handleSubmit: React.FormEventHandler = (e) => {
     e.preventDefault();
-    console.log(({
-      name,
-      amount
-    }));
-
-
+    addDocument(({ amount, name, uid }));
   }
+
+  useEffect(() => {/* To clear form on submission success */
+    if (response.success) {
+      setName('')
+      setAmount('')
+    }
+  }, [response.success]);
+
   return (
     <>
       <h3>Add a Thing</h3>
@@ -31,7 +37,8 @@ export default function TransactionForm() {
           <span>Item Value ($): </span>
           <input type="number"
             required
-            min="0"
+            step="0.01"
+            min="0.01"
             onChange={e => setAmount(e.target.value)}
             value={amount}
           />
@@ -40,5 +47,4 @@ export default function TransactionForm() {
       </form>
     </>
   )
-
 }

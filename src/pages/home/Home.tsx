@@ -5,7 +5,7 @@ import styles from './Home.module.css'
 
 function Home() {
   const { user } = useAuthContext()
-  let ID = user ? user.uid : '';
+  let ID = user!.uid; // If there isn't a user, we couldn't be at the Home page.
 
   return (
     <div className={styles.container}>

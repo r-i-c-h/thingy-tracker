@@ -51,8 +51,6 @@ export const AuthContextProvider: FC = ({ children }) => {
     return () => unsubscribe()
   }, [])
 
-  console.log('AuthContext state:', state)
-
   return (
     <AuthContext.Provider value={{ ...state, dispatch }}>
       {children}

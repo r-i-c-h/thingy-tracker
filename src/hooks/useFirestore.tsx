@@ -1,11 +1,8 @@
 import { useEffect, useReducer, useState } from "react";
-import { firebase, projectFirestore, timestamp } from "../firebase/config";
+import { projectFirestore, timestamp } from "../firebase/config";
 import { handleError } from "../ts/ErrorHandler";
 
-type Action =
-  | { type: 'IS_PENDING' }
-  | { type: 'ADDED_DOCUMENT', payload: NewDocument }
-  | { type: 'ERROR', payload: string }
+type Action = { type: 'IS_PENDING', payload: null } | { type: 'ADDED_DOCUMENT', payload: NewDocument } | { type: 'ERROR', payload: string }
 
 type NewDocument = {
   amount: string | number;
@@ -31,25 +28,16 @@ let initialState: State = {
 const firestoreReducer = (state: State, action: Action): State => {
   switch (action.type) {
     case 'IS_PENDING':
-      return {
-        ...state,
-        isPending: true,
-        document: null, success: false, error: null // <~~ Resets
-      }
-    case 'ADDED_DOCUMENT':
-      return {
-        ...state,
-        isPending: false, document: action.payload, success: true, error: null
-      }
+      return { ...state, document: null, error: null, isPending: true, success: false }
     case 'ERROR':
-      return {
-        ...state,
-        isPending: false, document: null, success: false, error: action.payload
-      }
+      return { ...state, document: null, error: action.payload, isPending: false, success: false }
+    case 'ADDED_DOCUMENT':
+      return { ...state, document: action.payload, error: null, isPending: false, success: true }
     default:
       return state
   }
 }
+
 export const useFirestore = (collection: string) => {
   const [response, dispatch] = useReducer(firestoreReducer, initialState);
   const [isCancelled, setIsCancelled] = useState(false);
@@ -63,15 +51,16 @@ export const useFirestore = (collection: string) => {
       dispatch(action)
     }
   }
+
   const addDocument = async (doc: NewDocument) => {
-    dispatch({ type: 'IS_PENDING' })
+    await dispatch({ type: 'IS_PENDING', payload: null })
+
     try {
       const createdAt = timestamp.fromDate(new Date());
-      const res = await ref.add({ ...doc, createdAt }); // doc is {name,amount}
+      const addedDocumentRef: unknown = await ref.add({ ...doc, createdAt });
+      const newDoc = addedDocumentRef as NewDocument // <~~ Makes TS Happy ＜(。_。)＞
 
-      if (res) {
-        dispatchIfNotCancelled({ type: 'ADDED_DOCUMENT', payload: doc })
-      }
+      await dispatchIfNotCancelled({ type: 'ADDED_DOCUMENT', payload: newDoc })
     } catch (err) {
       dispatchIfNotCancelled({ type: 'ERROR', payload: handleError(err) })
     }
@@ -82,7 +71,7 @@ export const useFirestore = (collection: string) => {
   }
 
   useEffect(() => {
-    return () => setIsCancelled(true) //
+    return () => setIsCancelled(true)
   }, [])
 
   return { addDocument, deleteDocument, response }
