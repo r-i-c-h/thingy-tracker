@@ -1,18 +1,12 @@
 import { useEffect, useReducer, useState } from "react";
 import { projectFirestore, timestamp } from "../firebase/config";
 import { handleError } from "../ts/ErrorHandler";
+import { INewItem } from "../ts/interfaces";
 
-type Action = { type: 'IS_PENDING', payload: null } | { type: 'ADDED_DOCUMENT', payload: NewDocument } | { type: 'ERROR', payload: string }
-
-type NewDocument = {
-  amount: string | number;
-  createdAt?: Date
-  name: string;
-  uid: string;
-}
+type Action = { type: 'IS_PENDING', payload: null } | { type: 'ADDED_DOCUMENT', payload: INewItem } | { type: 'ERROR', payload: string }
 
 type State = {
-  document: null | NewDocument;
+  document: null | INewItem;
   error: null | string; //** Skipping unknown because `handleError()` will return a string */
   isPending: boolean;
   success: null | boolean;
@@ -52,13 +46,13 @@ export const useFirestore = (collection: string) => {
     }
   }
 
-  const addDocument = async (doc: NewDocument) => {
+  const addDocument = async (doc: INewItem) => {
     await dispatch({ type: 'IS_PENDING', payload: null })
 
     try {
       const createdAt = timestamp.fromDate(new Date());
       const addedDocumentRef: unknown = await ref.add({ ...doc, createdAt });
-      const newDoc = addedDocumentRef as NewDocument // <~~ Makes TS Happy ＜(。_。)＞
+      const newDoc = addedDocumentRef as INewItem // <~~ Makes TS Happy ＜(。_。)＞
 
       await dispatchIfNotCancelled({ type: 'ADDED_DOCUMENT', payload: newDoc })
     } catch (err) {
