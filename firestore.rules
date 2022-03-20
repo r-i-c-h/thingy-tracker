@@ -1,0 +1,16 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    match /transactions/{document=**} {
+      // create|delete|update  all of which = write
+      // allow read, write: if
+      // request.time < timestamp.date(2022, 4, 13);
+      allow create: if request.auth != null; // is User logged in
+
+      // `resource` is document being requested and `data` is its contents
+      // We added the `uid` field[+data] to each record in our own code's write-function
+      allow read, delete, update: if request.auth.uid == resource.data.uid;
+
+    }
+  }
+}
