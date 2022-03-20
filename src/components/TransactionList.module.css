@@ -1,6 +1,6 @@
 .transactions li {
-  margin: 0.92rem;
-  border: 1px solid #f2f2f2;
+  margin: 1rem;
+  outline: 1px solid #f2f2f2;
   box-shadow: 3px 3px 5px rgba(50, 50, 50, 0.1);
   padding: 0.36em;
   display: flex;
@@ -26,9 +26,10 @@
   background: #ddd;
   color: #777;
   border: none;
-  padding: 12px 8px;
+  border-radius: 0 0 0 5px;
+  padding: 8px 4px;
   text-align: center;
   line-height: 0;
-  font-size: 0.9em;
+  font-size: 0.5em;
   cursor: pointer;
 }

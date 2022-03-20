@@ -3,10 +3,14 @@ import { projectFirestore, timestamp } from "../firebase/config";
 import { handleError } from "../ts/ErrorHandler";
 import { INewItem } from "../ts/interfaces";
 
-type Action = { type: 'IS_PENDING', payload: null } | { type: 'ADDED_DOCUMENT', payload: INewItem } | { type: 'ERROR', payload: string }
+type Action =
+  | { type: 'IS_PENDING', payload: null }
+  | { type: 'ADDED_DOCUMENT', payload: INewItem }
+  | { type: 'DELETED_DOCUMENT', payload: null }
+  | { type: 'ERROR', payload: string }
 
 type State = {
-  document: null | INewItem;
+  document: null | INewItem
   error: null | string; //** Skipping unknown because `handleError()` will return a string */
   isPending: boolean;
   success: null | boolean;
@@ -23,10 +27,12 @@ const firestoreReducer = (state: State, action: Action): State => {
   switch (action.type) {
     case 'IS_PENDING':
       return { ...state, document: null, error: null, isPending: true, success: false }
-    case 'ERROR':
-      return { ...state, document: null, error: action.payload, isPending: false, success: false }
     case 'ADDED_DOCUMENT':
       return { ...state, document: action.payload, error: null, isPending: false, success: true }
+    case 'DELETED_DOCUMENT':
+      return { ...state, document: null, error: null, isPending: false, success: true }
+    case 'ERROR':
+      return { ...state, document: null, error: action.payload, isPending: false, success: false }
     default:
       return state
   }
@@ -61,7 +67,13 @@ export const useFirestore = (collection: string) => {
   }
 
   const deleteDocument = async (id: string) => {
-    await ref.doc(id).delete();
+    await dispatch({ type: 'IS_PENDING', payload: null })
+    try {
+      const deletedDocument = await ref.doc(id).delete();
+      dispatchIfNotCancelled({ type: 'DELETED_DOCUMENT', payload: null })
+    } catch (err) {
+      dispatchIfNotCancelled({ type: 'ERROR', payload: handleError(err) })
+    }
   }
 
   useEffect(() => {
